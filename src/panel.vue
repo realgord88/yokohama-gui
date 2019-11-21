@@ -42,15 +42,15 @@
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                         <div class="review-content-section">
                                             <div class="input-group mg-b-pro-edt">
-                                                <span class="input-group-addon"><i class="icon nalika-user" aria-hidden="true"></i></span>
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="ip" class="form-control" placeholder="IP">
                                             </div>
                                             <div class="input-group mg-b-pro-edt">
-                                                <span class="input-group-addon"><i class="icon nalika-edit" aria-hidden="true"></i></span>
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="average" class="form-control" placeholder="Average">
                                             </div>
                                             <div class="input-group mg-b-pro-edt">
-                                                <span class="input-group-addon"><i class="fa fa-usd" aria-hidden="true"></i></span>
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="date" class="form-control" placeholder="Date">
                                             </div>
                                             <div class="input-group mg-b-pro-edt">
@@ -61,20 +61,24 @@
                                                 <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="reference_value_up" class="form-control" placeholder="Reference value up">
                                             </div>
+                                            <div class="input-group mg-b-pro-edt">
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
+                                                <input type="text" v-model="repeat_time" ref="repeat_time" class="form-control" placeholder="Repeat time">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
                                         <div class="review-content-section">
                                             <div class="input-group mg-b-pro-edt">
-                                                <span class="input-group-addon"><i class="icon nalika-user" aria-hidden="true"></i></span>
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="port" class="form-control" placeholder="Port">
                                             </div>
                                             <div class="input-group mg-b-pro-edt">
-                                                <span class="input-group-addon"><i class="icon nalika-favorites-button" aria-hidden="true"></i></span>
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="lenght" class="form-control" placeholder="Lenght">
                                             </div>
                                             <div class="input-group mg-b-pro-edt">
-                                                <span class="input-group-addon"><i class="fa fa-usd" aria-hidden="true"></i></span>
+                                                <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="time" class="form-control" placeholder="Time">
                                             </div>
                                             <div class="text-left custom-pro-edt-ds">
@@ -86,7 +90,8 @@
                                                 <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="reference_value_down" class="form-control" placeholder="Reference value down">
                                             </div>
-                                            
+                                            <button type="button" class="btn btn-ctl-bt btn-info "> {{reference_value_up}} </button>
+                                            <button type="button" class="btn btn-ctl-bt btn-info "> {{reference_value_down}} </button>
                                             </div>
                                         </div>
                                     </div>
@@ -128,7 +133,9 @@ export default {
       responce_server: '',  
       messages: [],
       connect_status: 'error',
-      alert: false
+      alert: false,
+      reference_value_up: '',
+      reference_value_down: ''
     };
   },
     methods: {
@@ -160,7 +167,7 @@ export default {
         get_metrics: function () {
             HTTP.get('api/metrics/')
             .then(response => (this.responce_server = response.data.data)
-            .then(this.messages.push(this.responce_server)));
+            .then(this.messages.push(this.responce_server + ' dbm')));
             console.log(this.responce_server);
             var today = new Date();
             var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+'T'+today.getHours()+':'+today.getMinutes()+':'+today.getSeconds()+'Z';
