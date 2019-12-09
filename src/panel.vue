@@ -6,15 +6,37 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
                     <div class="review-tab-pro-inner">
                         <ul class="tab-review-design">
-                            <button type="button" v-on:click="get_info" class="btn btn-ctl-bt btn-info "> Info </button>
+
                             <button type="button" v-on:click="get_metrics" class="btn btn-ctl-bt btn-info "> Metrics </button>
                             <button type="button" v-on:click="set_lenght" class="btn btn-ctl-bt btn-info "> Set lenght </button>
                             <button type="button" v-on:click="set_averaging" class="btn btn-ctl-bt btn-info "> Set average </button>
-                            <button type="button" v-on:click="info_slots" class="btn btn-ctl-bt btn-info "> Slots info </button>
+                            <button type="button" v-on:click="set_offset" class="btn btn-ctl-bt btn-info "> Set offset </button>
                             <button type="button" v-on:click="set_date" class="btn btn-ctl-bt btn-info "> Set date </button>
                             <button type="button" v-on:click="set_time" class="btn btn-ctl-bt btn-info "> Set time </button>
-                            <button type="button" v-on:click="set_offset" class="btn btn-ctl-bt btn-info "> Set offset </button>
+                            <button type="button" v-on:click="info_slots" class="btn btn-ctl-bt btn-info "> Slots info </button>
                             <button type="button" v-on:click="check_errors" class="btn btn-ctl-bt btn-info "> Check errors </button>
+
+                            <template v-if="repeat_status=='False'">
+                                                <button type="button" v-on:click="repeat_start" class="btn  btn-success waves-effect ">
+                                                    <template v-if="repeat_status=='False'">
+                                                        Repeat start
+                                                    </template>
+                                                    <template v-else="repeat_status=='True'">
+                                                        Repeat stop
+                                                    </template>
+                                                </button>
+                                            </template>
+                                            <template v-else="repeat_status=='True'">
+                                                <button type="button" v-on:click="repeat_stop" class="btn  btn-danger waves-effect ">
+                                                    <template v-if="repeat_status=='False'">
+                                                        Repeat start
+                                                    </template>
+                                                    <template v-else="repeat_status=='True'">
+                                                        Repeat stop
+                                                    </template>
+                                                </button>
+                                            </template>
+
                             <template v-if="connect_status=='error' || connect_status=='disconnected'">
                                                 <button type="button" v-on:click="connect" class="btn  btn-success waves-effect ">
                                                     <template v-if="connect_status=='error' || connect_status=='disconnected'">
@@ -26,7 +48,7 @@
                                                 </button>
                                             </template>
                                             <template v-else="connect_status=='connected'">
-                                                <button type="button" v-on:click="disconnect" class="btn  btn-success waves-effect ">
+                                                <button type="button" v-on:click="disconnect" class="btn  btn-danger waves-effect ">
                                                     <template v-if="connect_status=='error' || connect_status=='disconnected'">
                                                         Connect
                                                     </template>
@@ -63,7 +85,7 @@
                                             </div>
                                             <div class="input-group mg-b-pro-edt">
                                                 <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
-                                                <input type="text" v-model="repeat_time" ref="repeat_time" class="form-control" placeholder="Repeat time">
+                                                <input type="text" v-model="repeat_time" ref="repeat_time" class="form-control" placeholder="Repeat time (seconds)">
                                             </div>
                                         </div>
                                     </div>
@@ -90,8 +112,8 @@
                                                 <span class="input-group-addon"><i class="icon nalika-new-file" aria-hidden="true"></i></span>
                                                 <input type="text" ref="reference_value_down" class="form-control" placeholder="Reference value down">
                                             </div>
-                                            <button type="button" class="btn btn-ctl-bt btn-info "> {{reference_value_up}} </button>
-                                            <button type="button" class="btn btn-ctl-bt btn-info "> {{reference_value_down}} </button>
+                                            <button type="button" class="btn btn-ctl-bt btn-info "> {{reference_value_up}} dBm</button>
+                                            <button type="button" class="btn btn-ctl-bt btn-info "> {{reference_value_down}} dBm</button>
                                             </div>
                                         </div>
                                     </div>
@@ -134,17 +156,29 @@ export default {
       messages: [],
       connect_status: 'error',
       alert: false,
-      reference_value_up: '',
-      reference_value_down: ''
+      reference_value_up: '0',
+      reference_value_down: '0',
+      repeat_time: '',
+      repeat_status: 'False'
     };
   },
     methods: {
+        repeat_start: function () {
+            this.interval = setInterval(() => this.get_metrics(), this.repeat_time+'000');
+            this.repeat_status = 'True';
+        },
+
+        repeat_stop: function () {
+            clearInterval(this.interval);
+            this.repeat_status = 'False';
+        },
+
         connect: function () {
             this.ip = this.$refs.ip.value;
             this.port = this.$refs.port.value;
             var bodyFormData = new FormData();
             bodyFormData.set('ip', this.ip);
-            bodyFormData.set('port', this.port);
+            bodyFormData.set('port', this.port);+'0000'
             HTTP.post('api/connect/', bodyFormData, {headers: {'Content-Type': 'application/vnd.api+json'}})
             .then(response => (this.responce_server = response.data.status)
             .then(this.messages.push(this.responce_server)
@@ -156,12 +190,6 @@ export default {
             .then(response => (this.responce_server = response.data.status)
             .then(this.messages.push(this.responce_server)
             .then(this.connect_status=this.responce_server)));
-        },
-
-        get_info: function () {
-            HTTP.get('api/info/')
-            .then(response => (this.responce_server = response.data.data)
-            .then(this.messages.push(this.responce_server)));
         },
 
         get_metrics: function () {
